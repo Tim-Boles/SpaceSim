@@ -34,7 +34,7 @@ class PlayerController(Actor):
         new_laser.create(
             {
                 "angle" : math.atan2(-self.delta_y, self.delta_x),
-                "player_pos" : self.transform.position
+                "player_pos" : self.transform.position.copy()
             }
         )
         new_laser.start()
