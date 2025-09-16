@@ -1,0 +1,27 @@
+# Python virtual environment folders
+venv/
+.venv/
+env/
+.env/
+
+# Python cache and bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables - DO NOT commit secrets!
+.env
+
+# IDE and editor specific files
+.vscode/
+.idea/
+.DS_Store
+
+# Build artifacts (for creating executables with PyInstaller, etc.)
+dist/
+build/
+*.spec
+
+# Log files
+*.log
