@@ -14,7 +14,8 @@ class PlayerController(Actor):
                  play_pos: pygame.Vector2, 
                  key_configs: dict[str, int], 
                  player_speed: int, 
-                 laser_animations: list[Animation]
+                 laser_animations: list[Animation],
+                 laser_delay: float
                 ) -> None:
         self.current_input =  InputHandler(key_configs)
         self.speed = player_speed
@@ -23,13 +24,19 @@ class PlayerController(Actor):
         self.lasers = laser_animations
         self.delta_x = 0
         self.delta_y = 0
+        self.time = 0
+        self.laser_delay = laser_delay
+        self.can_shoot = True
         super().__init__(name, player_animation, Transform(play_pos))
 
     def is_accelerating(self) -> bool:
         answer = True if self.transform.acceleration.magnitude() > 0 else False
         return answer
     
-    def create_laser(self) -> Laser:
+    def create_laser(self) -> Laser | None:
+        if not self.can_shoot:
+            return None
+
         new_laser = Laser("new_laser", self.lasers[0], Transform(self.transform.position), 360)
         new_laser.create(
             {
@@ -38,12 +45,18 @@ class PlayerController(Actor):
             }
         )
         new_laser.start()
+        self.can_shoot = False
         return new_laser
     
     def start(self):
         return super().start()
 
     def update(self, dt, args: dict[str, Any]):
+        self.time += dt
+        if self.time >= self.laser_delay:
+            if not self.can_shoot:
+                self.can_shoot = True
+            self.time = 0
         self.transform.position += self.transform.acceleration * self.speed * dt
         self.mouse_pos = pygame.mouse.get_pos()
         self.delta_x = self.mouse_pos[0] - self.transform.position.x

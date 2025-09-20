@@ -35,7 +35,15 @@ laser_actors = []
 asteroid_actors = []
 
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-player_controller = PlayerController("ship", graphics_manager.ship, player_pos, key_configs, 300, [graphics_manager.laser])
+player_controller = PlayerController(
+    "ship", 
+    graphics_manager.ship, 
+    player_pos,
+    key_configs, 
+    300, 
+    [graphics_manager.laser],
+    0.1
+)
 player_controller.start()
 player_controller.create({"angle":0, "pos":player_pos})
 actors.append(player_controller)
@@ -72,8 +80,9 @@ while running:
 
     if clicked[0] and context[0] == "Combat":
         new_laser = player_controller.create_laser()
-        actors.append(new_laser)
-        laser_actors.append(new_laser)
+        if new_laser:
+            actors.append(new_laser)
+            laser_actors.append(new_laser)
 
     for actor in actors:
         actor.update(dt, {"screen": screen})
