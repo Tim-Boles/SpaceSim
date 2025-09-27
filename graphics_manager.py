@@ -24,3 +24,7 @@ class GraphicsManager(object):
         frame_3 = Frame(2, self.sprite_sheets["M484BulletCollection2"].get_image(1411))
         frame_4 = Frame(3, self.sprite_sheets["M484BulletCollection2"].get_image(1412))
         self.laser = Animation([frame_1, frame_2, frame_3, frame_4], (True, 0), 30, 0)
+
+        # Build a sprite and its animation for the asteroid
+        frame_1 = Frame(0, self.sprite_sheets["AsteroidAnimation"].get_image(0))
+        self.asteroid = Animation([frame_1], (False, 0), 1, 0)

@@ -2,6 +2,9 @@ import pygame
 from player import PlayerController
 from graphics_manager import GraphicsManager
 from actor import Actor
+from asteroid import Asteroid
+from transform import Transform
+
 FPS = 60
 
 # pygame setup
@@ -13,8 +16,21 @@ dt = 0
 
 graphics_manager = GraphicsManager(
     {
-        "shipsprite1.png" : [pygame.Vector2(192,512), pygame.Vector2(64,64), pygame.Vector2(0,0)],
-        "M484BulletCollection2.png" : [pygame.Vector2(1420,760), pygame.Vector2(16,16), pygame.Vector2(0,7)]
+        "shipsprite1.png" : [
+            pygame.Vector2(192,512), 
+            pygame.Vector2(64,64), 
+            pygame.Vector2(0,0)
+        ],
+        "M484BulletCollection2.png" : [
+            pygame.Vector2(1420,760), 
+            pygame.Vector2(16,16), 
+            pygame.Vector2(0,7)
+        ],
+        "AsteroidAnimation.png" : [
+            pygame.Vector2(1024,1024),
+            pygame.Vector2(128,128),
+            pygame.Vector2(0,0)
+        ]
     }
 )
 
@@ -29,10 +45,12 @@ key_configs = {
 
 # All Actors
 actors: list[Actor] = []
-# Lasers
-laser_actors = []
-# Asteroids
-asteroid_actors = []
+
+# Temp adding an asteroid
+test_asteroid = Asteroid("test", graphics_manager.asteroid, Transform(pygame.Vector2(50,50)))
+test_asteroid.start()
+test_asteroid.create({"angle":0, "pos":pygame.Vector2(50,50)})
+actors.append(test_asteroid)
 
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 player_controller = PlayerController(
@@ -48,7 +66,7 @@ player_controller.start()
 player_controller.create({"angle":0, "pos":player_pos})
 actors.append(player_controller)
 
-clicked = (False, pygame.Vector2(0,0))
+clicked = (False, "none")
 context = ("Combat", 0)
 
 while running:
@@ -69,8 +87,7 @@ while running:
         
         if event.type in input_events:
             player_controller.current_input.handle_event(event)
-            player_controller.transform.acceleration = player_controller.current_input.get_movement_vector()
-            clicked = player_controller.current_input.handle_click(event)
+            clicked = player_controller.current_input.handle_click()
     
     if player_controller.is_accelerating():
         if not player_controller.animation.running:
@@ -82,10 +99,17 @@ while running:
         new_laser = player_controller.create_laser()
         if new_laser:
             actors.append(new_laser)
-            laser_actors.append(new_laser)
 
     for actor in actors:
-        actor.update(dt, {"screen": screen})
+        actor.update(
+            dt, 
+            {
+                "screen": screen
+            }
+        )
+        if actor.destroy:
+            actors.remove(actor)
+            del actor
     # flip() the display to put your work on screen
     pygame.display.flip()
 

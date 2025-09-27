@@ -4,6 +4,7 @@ class InputHandler(object):
     def __init__(self, player_movement_keys: dict[str, int]) -> None:
         self.player_movement_keys = player_movement_keys
         self.current_input = {}
+        self.mouse_button_one = False
 
     def handle_event(self, event: pygame.Event) -> None:
         """Updates the dictionary of currently pressed keys."""
@@ -14,14 +15,18 @@ class InputHandler(object):
         elif event.type in up_event:
             self.current_input.pop(event.key if event.type == pygame.KEYUP else f"mb_{event.button}", None)
 
-    def handle_click(self, event: pygame.Event) -> tuple[bool, pygame.Vector2]:
+    def handle_click(self) -> tuple[bool, str]:
         """Resolves any mouse clicks in the Frame"""
         if "mb_1" in self.current_input.keys():
             if self.current_input["mb_1"] == True:
-                print("I clicked")
                 self.current_input["mb_1"] = False
-                return (True, event.pos)
-        return (False, pygame.Vector2(0,0))   
+                self.mouse_button_one = True
+                return (True, "down")
+        else:
+            self.mouse_button_one = False
+        if self.mouse_button_one:
+            return (True, "held")           
+        return (False, "none")   
     def get_movement_vector(self) -> pygame.Vector2:
         """
         Calculates the movement vector based on the currently pressed keys.
