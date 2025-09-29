@@ -2,10 +2,7 @@ import pygame
 from player import PlayerController
 from graphics_manager import GraphicsManager
 from actor import Actor
-from asteroid import Asteroid
-from transform import Transform
-
-FPS = 60
+from asteroid import AsteroidManager
 
 # pygame setup
 pygame.init()
@@ -13,6 +10,10 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 dt = 0
+FPS = 60
+ASTEROID_TICK = pygame.event.custom_type()
+pygame.time.Clock().tick(FPS)
+pygame.time.set_timer(ASTEROID_TICK, 1000)
 
 graphics_manager = GraphicsManager(
     {
@@ -34,6 +35,11 @@ graphics_manager = GraphicsManager(
     }
 )
 
+asteroid_manager = AsteroidManager(
+    [graphics_manager.asteroid],
+    (1280, 720)
+)
+
 # Player Controller
 key_configs = {
     "w" : pygame.K_w,
@@ -45,12 +51,6 @@ key_configs = {
 
 # All Actors
 actors: list[Actor] = []
-
-# Temp adding an asteroid
-test_asteroid = Asteroid("test", graphics_manager.asteroid, Transform(pygame.Vector2(50,50)))
-test_asteroid.start()
-test_asteroid.create({"angle":0, "pos":pygame.Vector2(50,50)})
-actors.append(test_asteroid)
 
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 player_controller = PlayerController(
@@ -88,6 +88,10 @@ while running:
         if event.type in input_events:
             player_controller.current_input.handle_event(event)
             clicked = player_controller.current_input.handle_click()
+        
+        if event.type == ASTEROID_TICK:
+            created_asteroid = asteroid_manager.create_asteroid()
+            actors.append(created_asteroid)
     
     if player_controller.is_accelerating():
         if not player_controller.animation.running:
@@ -112,9 +116,5 @@ while running:
             del actor
     # flip() the display to put your work on screen
     pygame.display.flip()
-
-    
-    
-    
 
 pygame.quit()
