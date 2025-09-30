@@ -111,9 +111,7 @@ while running:
                 "screen": screen
             }
         )
-        if actor.destroy:
-            actors.remove(actor)
-            del actor
+    actors = [actor for actor in actors if not actor.destroy]
     # flip() the display to put your work on screen
     pygame.display.flip()
 

@@ -10,6 +10,7 @@ class Asteroid(Actor):
         self.speed = speed
         self.has_hit_screen = False
         self.on_screen_counter = 0
+        self.off_screen_counter = 0
         super().__init__(name, actor_animation, actor_transform)
     
     def start(self):
@@ -17,7 +18,10 @@ class Asteroid(Actor):
 
     def update(self, dt, args):
         if self.is_off_screen and self.has_hit_screen:
-            self.destroy = True
+            self.off_screen_counter += 1
+            if self.off_screen_counter > 10:
+                print("Asteroid Destroyed")
+                self.destroy = True
         if not self.is_off_screen:
             self.on_screen_counter += 1
             if self.on_screen_counter > 10:
